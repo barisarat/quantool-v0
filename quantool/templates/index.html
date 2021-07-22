@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang='en' dir='ltr'>
+  <head>
+    <meta charset="utf-8">
+    <title>Home</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'main.css'%}">
+  </head>
+  <body>
+    <h1>This is the home page</h1>
+    <h3>Wow, crazy!</h3>
+    <a href="{% url 'result' %}">Go to contact page.</a>
+    <button onclick="buttonFunc()">Click me for a suprise!</button>
+    <img src="{% static 'data-science.png' %}" alt="">
+    <script type="text/javascript" src="{% static 'main.js' %}">
+    </script>
+    <form action="{% url 'result' %}">
+      {% csrf_token %}
+      <input type="text" name="user_input">
+      <input type="submit" value="Click Me">
+
+    </form>
+  </body>
+</html>
