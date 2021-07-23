@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 
 def btc_predict(user_input=0):
 
-    price = pd.read_csv('~/Desktop/quantool-django/coins-high-market-cap.csv')
+    price = pd.read_csv('/home/ubuntu/quantool-v0/coins-high-market-cap.csv')
     price.drop('Unnamed: 0', axis=1, inplace=True)
     price['Date'] = pd.to_datetime(price['Date'])
     price = price.set_index('Date')
