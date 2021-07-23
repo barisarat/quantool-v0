@@ -1,15 +1,17 @@
-# FEATURES: technical anaysis indicators
-# TARGET: price up or down
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import talib as tlb # ?tlb.SMA use ? to check out functions | dir(tlb) check all abailable funcs
-from sklearn.neighbors import KNeighborsClassifier
+
+from ta.trend import SMAIndicator # technical analysis library
+from ta.volatility import BollingerBands
+from ta.momentum import RSIIndicator
+
+from sklearn.neighbors import KNeighborsClassifier # ml learning library
 from sklearn.model_selection import train_test_split
 
 def btc_predict(user_input=0):
 
-    price = pd.read_csv('~/Desktop/quantool-v1/coins-high-market-cap.csv')
+    price = pd.read_csv('~/Desktop/quantool-django/coins-high-market-cap.csv')
     price.drop('Unnamed: 0', axis=1, inplace=True)
     price['Date'] = pd.to_datetime(price['Date'])
     price = price.set_index('Date')
@@ -18,14 +20,21 @@ def btc_predict(user_input=0):
 
     # STEP 1: BUILDING FEATURES ARRAY
     # Normalized MA diff
-    ma_50 = tlb.SMA(price['Close-BTCUSDT'].values, 50) #50
-    ma_100 = tlb.SMA(price['Close-BTCUSDT'].values, 100) #100
+    ma_50 = SMAIndicator(price['Close-BTCUSDT'], 50) # takes pandas series input
+    ma_50 = ma_50.sma_indicator().values # convert to numpy for ml model
+    ma_100 = SMAIndicator(price['Close-BTCUSDT'], 100)
+    ma_100 = ma_100.sma_indicator().values
     sma_diff = (ma_50 - ma_100)/ma_50
+
     # BOLLINGER BANDS
-    upper_b, middle_b, lower_b = tlb.BBANDS(price['Close-BTCUSDT'].values, 100, 1, 1)
-    bband_oscilator = price['Close-BTCUSDT'].values - middle_b
+    bollinger = BollingerBands(price['Close-BTCUSDT'])
+    middle_b = bollinger.bollinger_mavg().values
+    bband_oscilator = (price['Close-BTCUSDT'].values - middle_b)
+
     #RSI
-    rsi = tlb.RSI(price['Close-BTCUSDT'].values, timeperiod=14)
+    rsi = RSIIndicator(price['Close-BTCUSDT'], 14)
+    rsi = rsi.rsi().values
+
     # THIS IS THE FEATURES DATA
     data = np.stack((sma_diff, bband_oscilator, rsi), axis=1)
     btc_indicators = data[99:]
